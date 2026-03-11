@@ -40,7 +40,7 @@ SpaceMaid is part of the Maid Audio suite:
 
 - **FreeEQ8** — parametric EQ - https://github.com/GareBear99/FreeEQ8
 - **BassMaid** — low-end enhancement - https://github.com/GareBear99/BassMaid
-- **GlueMaid** — glue and cohesion
+- **GlueMaid** — glue and cohesion - https://github.com/GareBear99/GlueMaid
 - **SpaceMaid** — depth, width, and ambience - https://github.com/GareBear99/SpaceMaid
 
 Together, these plugins form a lightweight mixing toolkit.
