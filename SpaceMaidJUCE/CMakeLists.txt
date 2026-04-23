@@ -51,3 +51,8 @@ target_link_libraries(SpaceMaid PRIVATE
     juce::juce_dsp
     juce::juce_gui_extra
 )
+
+# Auto-added: generate JuceHeader.h for sources that include <JuceHeader.h>
+juce_generate_juce_header(SpaceMaid)
+
+target_compile_definitions(SpaceMaid PRIVATE JUCE_VST3_CAN_REPLACE_VST2=0)

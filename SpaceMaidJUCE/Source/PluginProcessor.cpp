@@ -19,8 +19,8 @@ SpaceMaidAudioProcessor::SpaceMaidAudioProcessor()
 
 SpaceMaidAudioProcessor::~SpaceMaidAudioProcessor()
 {
-    for (auto* p : apvts.getParameterPointerList())
-        apvts.removeParameterListener(p->paramID, this);
+    for (auto* id : { IDs::blend, IDs::size, IDs::clarity, IDs::motion, IDs::keepPunch, IDs::mix, IDs::output })
+        apvts.removeParameterListener (id, this);
 }
 
 const juce::String SpaceMaidAudioProcessor::getName() const { return "SpaceMaid"; }
@@ -225,9 +225,9 @@ void SpaceMaidAudioProcessor::updateDSPIfNeeded()
 
         for (int ch=0; ch<2; ++ch)
         {
-            *hp[ch].state = *hpC;
-            *lp[ch].state = *lpC;
-            *shelf[ch].state = *shC;
+            *hp[ch].coefficients = *hpC;
+            *lp[ch].coefficients = *lpC;
+            *shelf[ch].coefficients = *shC;
         }
     }
 }
@@ -279,8 +279,12 @@ void SpaceMaidAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         preDelayWrite = wr;
     }
 
-    // Reverb (in-place)
-    reverb.processStereo(wetBuf.getWritePointer(0), wetBuf.getWritePointer(1), numSamples);
+    // Reverb (in-place) — juce::dsp::Reverb uses the standard ProcessContext API.
+    {
+        juce::dsp::AudioBlock<float> rvBlk(wetBuf);
+        juce::dsp::ProcessContextReplacing<float> rvCtx(rvBlk);
+        reverb.process(rvCtx);
+    }
 
     // Wet-only chorus/modulation
     {
@@ -395,4 +399,10 @@ void SpaceMaidAudioProcessor::setStateInformation (const void* data, int sizeInB
     if (xml && xml->hasTagName(apvts.state.getType()))
         apvts.replaceState(juce::ValueTree::fromXml(*xml));
     dspDirty.store(true, std::memory_order_release);
+}
+
+// Standard JUCE factory (required by juce_add_plugin).
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new SpaceMaidAudioProcessor();
 }
